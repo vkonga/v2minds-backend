@@ -43,7 +43,7 @@ app.post("/notes", async (request, response) => {
         // SQL query to insert a new note
         const addNotes = `
             INSERT INTO notes(id, content, created_at)
-            VALUES (${id}, '${content}', '${createdAt}');
+            VALUES ('${id}', '${content}', '${createdAt}');
         `;
         // Execute the query
         await db.run(addNotes);
