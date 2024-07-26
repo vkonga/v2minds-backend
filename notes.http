@@ -1,0 +1,14 @@
+POST http://localhost:3000/notes
+Content-Type: application/json
+
+{
+    "id":2,
+    "content":"how are you!",
+    "createdAt":"2022-06-20"
+}
+
+###
+GET http://localhost:3000/notes
+
+###
+DELETE http://localhost:3000/notes/1
