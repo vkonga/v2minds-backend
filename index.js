@@ -46,9 +46,9 @@ app.post("/notes", async (request, response) => {
             VALUES ('${id}', '${content}', '${createdAt}');
         `;
         // Execute the query
-        await db.run(addNotes);
+        const notes = await db.run(addNotes);
         // Respond with a success message
-        response.send("Note added successfully");
+        response.send(notes);
     } catch (e) {
         // Handle errors during insertion
         response.send("Adding Note Unsuccessful");
