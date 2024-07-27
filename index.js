@@ -82,9 +82,9 @@ app.delete("/notes/:id", async (request, response) => {
             WHERE id = ${id};
         `;
         // Execute the query
-        await db.run(deleteQuery);
+        const deleteNotes = await db.run(deleteQuery);
         // Respond with a success message
-        response.send("Deleted Successfully");
+        response.send(deleteNotes);
     } catch (e) {
         // Handle errors during deletion
         response.send("Error deleting note");
