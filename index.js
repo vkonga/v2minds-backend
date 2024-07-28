@@ -44,7 +44,7 @@ app.post("/notes", async (request, response) => {
         const addNotes = {
             id: uuid(),
             content,
-            createdAt: new Date().toDateString();
+            createdAt: new Date().toDateString()
         };
         notes.push(addNotes);
         response.send("Note added successfully");
