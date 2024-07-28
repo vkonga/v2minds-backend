@@ -81,7 +81,7 @@ app.delete("/notes/:id", async (request, response) => {
 
     try (notes.length < initialLength) {
         response.send({ message: 'Note deleted successfully' });
-    } catch (error) {
+    } catch (e) {
         response.send({ message: 'Note not found' });
     }
 });
