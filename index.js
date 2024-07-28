@@ -43,15 +43,15 @@ app.post("/notes", async (request, response) => {
         // SQL query to insert a new note
         const addNotes = `
             INSERT INTO notes(id, content, created_at)
-            VALUES (${id}, '${content}', '${createdAt}');
+            VALUES ('${id}', '${content}', '${createdAt}');
         `;
         // Execute the query
-        const notes = await db.run(addNotes);
-        // Respond with a success message
-        response.send(notes);
+        await db.run(addNotes);
+        // Respond with a success message in JSON format
+        response.status(201).json({ message: "Note added successfully", note: { id, content, createdAt } });
     } catch (e) {
         // Handle errors during insertion
-        response.send("Adding Note Unsuccessful");
+        response.status(500).json({ error: "Adding Note Unsuccessful" });
     }
 });
 
@@ -64,11 +64,11 @@ app.get("/notes", async (request, response) => {
         `;
         // Execute the query and get the results
         const notes = await db.all(getNotes);
-        // Respond with the retrieved notes
-        response.send(notes);
+        // Respond with the retrieved notes in JSON format
+        response.json(notes);
     } catch (e) {
         // Handle errors during retrieval
-        response.send("Error retrieving notes");
+        response.status(500).json({ error: "Error retrieving notes" });
     }
 });
 
@@ -79,14 +79,14 @@ app.delete("/notes/:id", async (request, response) => {
         // SQL query to delete a note by ID
         const deleteQuery = `
             DELETE FROM notes 
-            WHERE id = ${id};
+            WHERE id = '${id}';
         `;
         // Execute the query
-        const deleteNotes = await db.run(deleteQuery);
-        // Respond with a success message
-        response.send(deleteNotes);
+        await db.run(deleteQuery);
+        // Respond with a success message in JSON format
+        response.json({ message: "Note deleted successfully" });
     } catch (e) {
         // Handle errors during deletion
-        response.send("Error deleting note");
+        response.status(500).json({ error: "Error deleting note" });
     }
 });
