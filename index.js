@@ -1,87 +1,48 @@
-const express = require('express'); 
-const app = express();    
+const express = require('express');
 const cors = require('cors');
-const { open } = require('sqlite');
-const path = require('path');
-const sqlite3 = require('sqlite3');
+const { v4: uuid } = require('uuid');
 
-// Middleware to parse JSON request bodies
+const app = express();
+const PORT = 3000; // Change to your preferred port
+
+// Middleware
+app.use(cors());
 app.use(express.json());
 
-// Enable CORS for all routes
-app.use(cors());
+// In-memory data store
+let notes = [];
 
-const dbPath = path.join(__dirname, "notes.db");
-let db = null;
-
-// Function to initialize the database and server
-const initializeDBAndServer = async () => {
-    try {
-        // Open the SQLite database
-        db = await open({
-            filename: dbPath,
-            driver: sqlite3.Database,
-        });
-        // Start the server on port 3000
-        app.listen(3000, () => {
-            console.log("Server Running at localhost:3000");
-        });
-    } catch (e) {
-        // Handle database connection errors
-        console.log(`DB Error: ${e.message}`);
-        process.exit(1);
-    }
-};
-
-// Initialize the database and server
-initializeDBAndServer();
-
-// Route to add a new note
-app.post("/notes", async (request, response) => {
-    try {
-        const { id, content, createdAt } = request.body;
-        // SQL query to insert a new note
-        const addNotes = `
-            INSERT INTO notes(id, content, created_at)
-            VALUES ('${id}', '${content}', '${createdAt}');
-        `;
-        // Execute the query
-        const notes = await db.run(addNotes);
-        // Respond with a success message
-        response.send(notes);
-    } catch (e) {
-        // Handle errors during insertion
-        response.send("Adding Note Unsuccessful");
-    }
+// GET endpoint to fetch all notes
+app.get('/notes', (req, res) => {
+    res.status(200).json(notes);
 });
 
-// Route to get all notes
-app.get("/notes", async (request, response) => {
-    try {
-        // SQL query to select all notes
-        const getNotes = `
-            SELECT * FROM notes;
-        `;
-        // Execute the query and get the results
-        const notes = await db.all(getNotes);
-        // Respond with the retrieved notes
-        response.send(notes);
-    } catch (e) {
-        // Handle errors during retrieval
-        response.send("Error retrieving notes");
-    }
+// POST endpoint to create a new note
+app.post('/notes', (req, res) => {
+    const { content } = req.body;
+    const newNote = {
+        id: uuid(),
+        content,
+        createdAt: new Date().toISOString(),
+    };
+    notes.push(newNote);
+    res.status(201).json(newNote);
 });
 
-// Route to delete a note by ID
-app.delete("/notes/:id", async (request, response) => {
-    const { id } = request.params;
+// DELETE endpoint to delete a note by id
+app.delete('/notes/:id', (req, res) => {
+    const { id } = req.params;
     const initialLength = notes.length;
-
     notes = notes.filter(note => note.id !== id);
-
-    try (notes.length < initialLength) {
-        response.send({ message: 'Note deleted successfully' });
-    } catch (e) {
-        response.send({ message: 'Note not found' });
+    
+    if (notes.length < initialLength) {
+        res.status(200).json({ message: 'Note deleted successfully' });
+    } else {
+        res.status(404).json({ message: 'Note not found' });
     }
+});
+
+// Start the server
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 });
