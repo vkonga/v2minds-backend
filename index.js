@@ -75,18 +75,13 @@ app.get("/notes", async (request, response) => {
 // Route to delete a note by ID
 app.delete("/notes/:id", async (request, response) => {
     const { id } = request.params;
-    try {
-        // SQL query to delete a note by ID
-        const deleteQuery = `
-            DELETE FROM notes 
-            WHERE id = ${id};
-        `;
-        // Execute the query
-        const deleteNotes = await db.run(deleteQuery);
-        // Respond with a success message
-        response.send(deleteNotes);
-    } catch (e) {
-        // Handle errors during deletion
-        response.send("Error deleting note");
+    const initialLength = notes.length;
+
+    notes = notes.filter(note => note.id !== id);
+
+    if (notes.length < initialLength) {
+        response.send({ message: 'Note deleted successfully' });
+    } else {
+        response.send({ message: 'Note not found' });
     }
 });
